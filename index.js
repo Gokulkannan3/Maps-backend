@@ -26,19 +26,25 @@ db.connect((err) => {
 
 app.post('/location', (req, res) => {
   const { latitude, longitude } = req.body;
+  const id = 1; // Default ID for the single row to update
+
   if (latitude && longitude) {
-    const query = 'INSERT INTO location (latitude, longitude) VALUES (?, ?)';
-    db.query(query, [latitude, longitude], (err, results) => {
+    const query = 'UPDATE location SET latitude = ?, longitude = ? WHERE id = ?';
+    db.query(query, [latitude, longitude, id], (err, results) => {
       if (err) {
         console.error('Database error:', err);
         return res.status(500).json({ message: 'Internal server error', error: err.message });
       }
-      res.status(200).json({ message: 'Location received and stored successfully', results });
+      if (results.affectedRows === 0) {
+        return res.status(404).json({ message: 'No data found to update for the given ID' });
+      }
+      res.status(200).json({ message: 'Location updated successfully', results });
     });
   } else {
     res.status(400).json({ message: 'Latitude and longitude are required' });
   }
 });
+
 
 app.get('/getlocation', (req, res) => {
   const query = 'SELECT latitude, longitude FROM location ORDER BY id DESC LIMIT 1';

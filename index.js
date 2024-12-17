@@ -25,20 +25,24 @@ db.connect((err) => {
 });
 
 app.post('/location', (req, res) => {
-  const { latitude, longitude } = req.body;
-  if (latitude && longitude) {
-    const query = 'INSERT INTO location (latitude, longitude) VALUES (?, ?)';
-    db.query(query, [latitude, longitude], (err, results) => {
-      if (err) {
-        console.error('Database error:', err);
-        return res.status(500).json({ message: 'Internal server error', error: err.message });
-      }
-      res.status(200).json({ message: 'Location received and stored successfully', results });
-    });
-  } else {
-    res.status(400).json({ message: 'Latitude and longitude are required' });
-  }
-});
+    const { latitude, longitude, id = 1 } = req.body;
+    if (latitude && longitude) {
+      const query = 'UPDATE location SET latitude = ?, longitude = ? WHERE id = ?';
+      db.query(query, [latitude, longitude, id], (err, results) => {
+        if (err) {
+          console.error('Database error:', err);
+          return res.status(500).json({ message: 'Internal server error', error: err.message });
+        }
+        if (results.affectedRows === 0) {
+          return res.status(404).json({ message: 'Location not found to update' });
+        }
+        res.status(200).json({ message: 'Location updated successfully', results });
+      });
+    } else {
+      res.status(400).json({ message: 'Latitude and longitude are required' });
+    }
+  });
+  
 
 app.get('/getlocation', (req, res) => {
   const query = 'SELECT latitude, longitude FROM location ORDER BY id DESC LIMIT 1';

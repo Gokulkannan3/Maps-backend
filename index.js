@@ -24,9 +24,9 @@ db.connect((err) => {
   console.log('connected');
 });
 
-app.post('/location', (req, res) => {
+app.put('/location', (req, res) => {
   const { latitude, longitude } = req.body;
-  const id = 1; // Default ID for the single row to update
+  const id = 1;
 
   if (latitude && longitude) {
     const query = 'UPDATE location SET latitude = ?, longitude = ? WHERE id = ?';

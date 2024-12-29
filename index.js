@@ -24,7 +24,7 @@ db.connect((err) => {
   console.log('connected');
 });
 
-app.put('/location', (req, res) => {
+app.post('/location', (req, res) => {
   const { latitude, longitude } = req.body;
   const id = 1;
 
